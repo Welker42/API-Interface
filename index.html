@@ -5,23 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Usuários</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e0f7fa; /* Azul claro */
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #00796b; /* Cor do texto do título */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .edit-btn {
+            background-color: #28a745; /* Verde */
+        }
+
+        .edit-btn:hover {
+            background-color: #218838; /* Verde mais escuro */
+        }
+
+        .delete-btn {
+            background-color: #dc3545; /* Vermelho */
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333; /* Vermelho mais escuro */
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 5px 0;
+            color: #00796b; /* Cor dos rótulos */
+        }
+
+        input[type="text"], input[type="email"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff; /* Azul */
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Azul mais escuro */
+        }
+    </style>
 </head>
 <body>
-    <h1>Gerenciar Usuários</h1>
-    
-    <ul id="users"></ul>
+    <div class="container">
+        <h1>Gerenciar Usuários</h1>
+        
+        <ul id="users"></ul>
 
-    <!-- Formulário para adicionar/editar usuário -->
-    <form id="user-form" onsubmit="handleFormSubmit(event)">
-        <input type="hidden" id="user-id" />
-        <label for="name">Nome:</label>
-        <input type="text" id="name" required />
-        <br />
-        <label for="email">Email:</label>
-        <input type="email" id="email" required />
-        <br />
-        <button type="submit">Salvar</button>
-    </form>
+        <!-- Formulário para adicionar/editar usuário -->
+        <form id="user-form" onsubmit="handleFormSubmit(event)">
+            <input type="hidden" id="user-id" />
+            <label for="name">Nome:</label>
+            <input type="text" id="name" required />
+            <label for="email">Email:</label>
+            <input type="email" id="email" required />
+            <button type="submit">Salvar</button>
+        </form>
+    </div>
 
     <script>
         const apiUrl = 'http://localhost:3000/api/users';
@@ -34,11 +132,12 @@
                     const userList = document.getElementById('users');
                     userList.innerHTML = '';
                     users.forEach(user => {
-                        console.log(user)
                         const li = document.createElement('li');
                         li.innerHTML = `${user.name} (${user.email}) 
-                            <button class="edit-btn" onclick="editUser(${user.idusers}, '${user.name}', '${user.email}')">Editar</button>
-                            <button class="delete-btn" onclick="deleteUser(${user.idusers})">Deletar</button>`;
+                            <div>
+                                <button class="edit-btn" onclick="editUser(${user.idusers}, '${user.name}', '${user.email}')">Editar</button>
+                                <button class="delete-btn" onclick="deleteUser(${user.idusers})">Deletar</button>
+                            </div>`;
                         userList.appendChild(li);
                     });
                 })
@@ -49,14 +148,12 @@
         function deleteUser(userId) {
             if (!confirm('Você tem certeza que deseja excluir este usuário?')) return;
         
-            // Verifique se userId é um número válido
             if (isNaN(userId) || userId == null || userId == undefined) {
                 console.error('ID do usuário é inválido:', userId);
                 alert('ID do usuário é inválido.');
                 return;
             }   
 
-        
             axios.delete(`${apiUrl}/${userId}`)
                 .then(response => {
                     console.log('Usuário deletado com sucesso:', response.data);
@@ -80,7 +177,7 @@
 
             if (userId) {
                 // Editar usuário
-                axios.put(`${apiUrl}${userId}`, user)
+                axios.put(`${apiUrl}/${userId}`, user)
                     .then(response => {
                         console.log('Usuário editado com sucesso:', response.data);
                         fetchUsers();
